@@ -4,6 +4,11 @@
 
 ---
 
+![License](https://img.shields.io/badge/license-MIT-green.svg)
+![Build](https://img.shields.io/badge/build-passing-brightgreen.svg)
+![Made with](https://img.shields.io/badge/made%20with-Google%20Apps%20Script-blue.svg)
+![Forks](https://img.shields.io/github/forks/Dmitze/VolunteerLetter?style=social)
+
 ## ❓ Що це таке?
 
 Це система, яка автоматизує створення офіційних документів на базі шаблону Google Docs. Дані беруться з Google Таблиці, куди потрапляють відповіді форми, і підставляються у шаблон у вигляді плейсхолдерів.
