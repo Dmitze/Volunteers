@@ -1,6 +1,6 @@
 function onNewFormSubmit(e) {
-  const templateId = "1e0a_txUrhshQgPAFHM8_sS33mRiGDe2b6TUFsQ1fmEU";
-  const folderId   = "1HR__Jol4t0OBsNggX4-9J92_SvXPbcCC";
+  const templateId = "";
+  const folderId   = "";
   const row        = e.values;
 
   const date    = new Date(row[0]);
