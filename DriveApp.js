@@ -35,8 +35,8 @@ function generateDocumentsBatch(format) {
   }
   const values       = sheet.getDataRange().getValues();
   const rows         = values.slice(1);
-  const templateId   = "1e0a_txUrhshQgPAFHM8_sS33mRiGDe2b6TUFsQ1fmEU";
-  const folderId     = "1HR__Jol4t0OBsNggX4-9J92_SvXPbcCC";
+  const templateId   = "";
+  const folderId     = "";
   let folder;
   try {
     folder = DriveApp.getFolderById(folderId);
