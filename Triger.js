@@ -1,6 +1,16 @@
+function escapeRegExp(string) {
+  return String(string).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function fileExists(folder, fileName) {
+  if (!folder) return false;
+  const files = folder.getFilesByName(fileName);
+  return files.hasNext();
+}
+
 function onNewFormSubmit(e) {
-  const templateId = "";
-  const folderId   = "";
+  const templateId = "1e0a_txUrhshQgPAFHM8_sS33mRiGDe2b6TUFsQ1fmEU"; // <-- ВСТАВТЕ СВІЙ ID шаблону
+  const folderId   = "1HR__Jol4t0OBsNggX4-9J92_SvXPbcCC"; // <-- ВСТАВТЕ СВІЙ ID папки
   const row        = e.values;
 
   const date    = new Date(row[0]);
@@ -8,7 +18,7 @@ function onNewFormSubmit(e) {
   const contactName = String(row[6] || "").replace(/\s+/g, '_');
   const orgName     = String(row[2] || "").replace(/\s+/g, '_');
   const baseName    = `${contactName}_${orgName}_${dateStr}`;
-  const fileName    = `${baseName}_GoogleDoc`;
+  const fileName    = `${baseName}_GoogleDoc.docx`;
 
   let folder;
   try {
@@ -65,10 +75,15 @@ function onNewFormSubmit(e) {
   doc.saveAndClose();
 }
 
+function deleteAllTriggers() {
+  const triggers = ScriptApp.getProjectTriggers();
+  triggers.forEach(trigger => ScriptApp.deleteTrigger(trigger));
+}
+
 function createTrigger() {
+  deleteAllTriggers();
   ScriptApp.newTrigger('onNewFormSubmit')
     .forSpreadsheet(SpreadsheetApp.getActive())
     .onFormSubmit()
     .create();
 }
-
