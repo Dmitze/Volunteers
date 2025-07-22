@@ -18,14 +18,6 @@ function generateDocumentsBatchDocx() {
   generateDocumentsBatch('docx');
 }
 
-function generateDocumentsBatchDocx() {
-  generateDocumentsBatch('docx');
-}
-
-function generateDocumentsBatchDocx() {
-  generateDocumentsBatch('docx');
-}
-
 function generateDocumentsBatch(format) {
   const ss      = SpreadsheetApp.getActiveSpreadsheet();
   const sheet   = ss.getSheetByName("Відповіді форми (1)");
@@ -35,8 +27,8 @@ function generateDocumentsBatch(format) {
   }
   const values       = sheet.getDataRange().getValues();
   const rows         = values.slice(1);
-  const templateId   = "";
-  const folderId     = "";
+  const templateId   = "1e0a_txUrhshQgPAFHM8_sS33mRiGDe2b6TUFsQ1fmEU";
+  const folderId     = "1HR__Jol4t0OBsNggX4-9J92_SvXPbcCC";
   let folder;
   try {
     folder = DriveApp.getFolderById(folderId);
