@@ -1,14 +1,4 @@
-function escapeRegExp(string) {
-  return String(string).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
-function safeAlert(message) {
-  try {
-    SpreadsheetApp.getUi().alert(message);
-  } catch (e) {
-    Logger.log(message);
-  }
-}
+const lang = 'uk'; 
 
 function generateDocumentsBatchPdf() {
   generateDocumentsBatch('pdf');
@@ -20,37 +10,43 @@ function generateDocumentsBatchDocx() {
 
 function generateDocumentsBatch(format) {
   const ss      = SpreadsheetApp.getActiveSpreadsheet();
-  const sheet   = ss.getSheetByName("Відповіді форми (1)");
+  const sheet   = ss.getSheetByName(config.SHEET_NAME);
   if (!sheet) {
-    safeAlert('❌ Лист "Відповіді форми (1)" не знайдено!');
+    safeAlert(getMessage(lang, 'sheetNotFound', {sheet: config.SHEET_NAME}));
     return;
   }
   const values       = sheet.getDataRange().getValues();
   const rows         = values.slice(1);
-  const templateId   = "1e0a_txUrhshQgPAFHM8_sS33mRiGDe2b6TUFsQ1fmEU";
-  const folderId     = "1HR__Jol4t0OBsNggX4-9J92_SvXPbcCC";
+  const templateId   = config.TEMPLATE_ID;
+  const folderId     = config.FOLDER_ID;
   let folder;
   try {
     folder = DriveApp.getFolderById(folderId);
   } catch (e) {
-    safeAlert('❌ Не вдалося знайти папку за ID: ' + folderId);
+    safeAlert(getMessage(lang, 'folderNotFound', {id: folderId}));
     return;
   }
 
   let generatedCount = 0;
   let processedCount = 0;
-  const placeholderToIndex = [2,3,4,5,6,7,8,9,10];
+
+  const placeholderToIndex = [2, 3, 4, 5, 6, 7, 8, 9];
+
   for (let idx = 0; idx < rows.length; idx++) {
-    if (processedCount >= 5) break;
+    if (processedCount >= config.PROCESS_LIMIT) break;
     const row = rows[idx];
-    if (!row[2]) continue;
-    const date    = new Date(row[0]);
-    const dateStr = Utilities.formatDate(date, Session.getScriptTimeZone(), "yyyy-MM-dd");
-    const contactName = String(row[6] || "").replace(/\s+/g, '_');
-    const orgName     = String(row[2] || "").replace(/\s+/g, '_');
-    const baseName    = `${contactName}_${orgName}_${dateStr}`;
-    const fileDocx    = `${baseName}.docx`;
-    const filePdf     = `${baseName}.pdf`;
+    if (!row[2]) continue; 
+    let dateObj = row[0] instanceof Date ? row[0] : new Date(row[0]);
+    let dateOnly = Utilities.formatDate(dateObj, Session.getScriptTimeZone(), 'yyyy-MM-dd'); 
+
+    const cText = String(row[2] || "").replace(/\s+/g, '_');
+    const dText = String(row[3] || "").replace(/\s+/g, '_');
+    const fText = String(row[5] || "").replace(/\s+/g, '_');
+
+    const fileNameBase = `${dateOnly}_${cText}_${dText}_${fText}`;
+    const fileDocx    = `${fileNameBase}.docx`;
+    const filePdf     = `${fileNameBase}.pdf`;
+
     if ((format==='pdf'  && fileExists(folder, filePdf)) ||
         (format==='docx' && fileExists(folder, fileDocx))) {
       continue;
@@ -60,9 +56,9 @@ function generateDocumentsBatch(format) {
     const body     = doc.getBody();
     const header   = doc.getHeader ? doc.getHeader() : null;
     const footer   = doc.getFooter ? doc.getFooter() : null;
-    const rawLast    = row[3] || "";      // D
-    const rawFirst   = row[4] || "";      // E
-    const combined   = `${rawLast} ${rawFirst}`.trim();
+    const lastName  = row[3] || ""; 
+    const firstName = row[4] || ""; 
+    const combined  = `${lastName} ${firstName}`.trim();
     const genderInfo = getGenderAndFormalName(combined);
     const greeting = genderInfo.gender === 'female'
       ? "Шановна пані"
@@ -74,26 +70,23 @@ function generateDocumentsBatch(format) {
       if (header) header.replaceText(re, value);
       if (footer) footer.replaceText(re, value);
     }
-    replaceAll("{greeting}", greeting);
-    replaceAll("{2}",      genderInfo.lastNom);
-    replaceAll("{2_gen}",  genderInfo.lastGen);
-    replaceAll("{2_dat}",  genderInfo.lastDat);
-    replaceAll("{3}",      genderInfo.firstNom);
-    replaceAll("{3_gen}",  genderInfo.firstGen);
-    replaceAll("{3_dat}",  genderInfo.firstDat);
 
-    for (let i = 0; i < 9; i++) {
+    replaceAll("{greeting}", greeting);
+    replaceAll("{2}",      lastName);  
+    replaceAll("{3}",      firstName); 
+    // Відмінювання (родовий/давальний)
+    replaceAll("{2_gen}",  declineUkrainianName(lastName, genderInfo.gender, "родовий"));
+    replaceAll("{2_dat}",  declinePhrase(String(row[5] || ""), genderInfo.gender, "давальний")); // теперь F:F и склонение фразы
+    replaceAll("{3_gen}",  declineUkrainianName(firstName, genderInfo.gender, "родовий"));
+    replaceAll("{3_dat}",  declineUkrainianName(firstName, genderInfo.gender, "давальний"));
+
+    for (let i = 0; i < placeholderToIndex.length; i++) {
       if (i === 1 || i === 2) continue;
       const ph = `{${i+1}}`;
-      let val;
-      if (i === 7) {
-        // {8} → колонка J → row[9]
-        val = String(row[9] || "");
-      } else {
-        val = String(row[ placeholderToIndex[i] ] || "");
-      }
+      const val = String(row[ placeholderToIndex[i] ] || "");
       replaceAll(ph, val);
     }
+
     doc.saveAndClose();
     if (format === 'pdf') {
       folder.createFile(copyFile.getAs("application/pdf").setName(filePdf));
@@ -107,8 +100,8 @@ function generateDocumentsBatch(format) {
   }
   safeAlert(
     generatedCount > 0
-      ? `✅ Згенеровано ${generatedCount} ${format.toUpperCase()} документів!`
-      : 'ℹ️ Нових документів для створення не знайдено.'
+      ? getMessage(lang, 'generated', {count: generatedCount, format: format.toUpperCase()})
+      : getMessage(lang, 'nothingToGenerate')
   );
 }
 
