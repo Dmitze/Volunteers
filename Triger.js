@@ -31,12 +31,9 @@ function onNewFormSubmit(e) {
   const body     = doc.getBody();
   const header   = doc.getHeader ? doc.getHeader() : null;
   const footer   = doc.getFooter ? doc.getFooter() : null;
-  const rawLast = row[4] || ""; // фамилия из E:E
-  const fio = (row[5] || "").trim(); // имя и отчество из F:F
-  const fioParts = fio.split(/\s+/);
-  const rawFirst = fioParts[0] || ""; // имя
-  const rawPatron = fioParts[1] || ""; // отчество (если есть)
-  const combined = `${rawLast} ${rawFirst} ${rawPatron}`.trim();
+  const lastName  = row[4] || ""; 
+  const firstName = row[5] || "";
+  const combined = `${lastName} ${firstName}`.trim();
   const genderInfo = getGenderAndFormalName(combined);
   const greeting   = genderInfo.gender === 'female' ? "Шановна пані" : "Шановний пан";
 
@@ -49,11 +46,11 @@ function onNewFormSubmit(e) {
 
   replaceAll("{greeting}", greeting);
   replaceAll("{2}",      genderInfo.lastNom);
-  replaceAll("{2_gen}",  genderInfo.lastGen);
-  replaceAll("{2_dat}",  declinePhrase(String(row[5] || ""), genderInfo.gender, "давальний")); // теперь F:F и склонение фразы
+  replaceAll("{2_gen}",  genderInfo.lastGen);  
+  replaceAll("{2_dat}",  genderInfo.lastDat);  
   replaceAll("{3}",      genderInfo.firstNom);
-  replaceAll("{3_gen}",  genderInfo.firstGen);
-  replaceAll("{3_dat}",  genderInfo.firstDat);
+  replaceAll("{3_gen}",  genderInfo.firstGen);  
+  replaceAll("{3_dat}",  genderInfo.firstDat);  
 
   const placeholderToIndex = [2,3,4,5,6,7,8,9,10];
   for (let i = 0; i < 9; i++) {

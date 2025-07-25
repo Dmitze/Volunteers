@@ -56,8 +56,8 @@ function generateDocumentsBatch(format) {
     const body     = doc.getBody();
     const header   = doc.getHeader ? doc.getHeader() : null;
     const footer   = doc.getFooter ? doc.getFooter() : null;
-    const lastName  = row[3] || ""; 
-    const firstName = row[4] || ""; 
+    const lastName  = row[4] || ""; // E:E
+    const firstName = row[5] || ""; // F:F
     const combined  = `${lastName} ${firstName}`.trim();
     const genderInfo = getGenderAndFormalName(combined);
     const greeting = genderInfo.gender === 'female'
@@ -73,11 +73,11 @@ function generateDocumentsBatch(format) {
 
     replaceAll("{greeting}", greeting);
     replaceAll("{2}",      lastName);  
+    replaceAll("{2_gen}",  genderInfo.lastGen);   
+    replaceAll("{2_dat}",  genderInfo.lastDat);   
     replaceAll("{3}",      firstName); 
-    replaceAll("{2_gen}",  declineUkrainianName(lastName, genderInfo.gender, "родовий"));
-    replaceAll("{2_dat}",  declinePhrase(String(row[5] || ""), genderInfo.gender, "давальний")); // теперь F:F и склонение фразы
-    replaceAll("{3_gen}",  declineUkrainianName(firstName, genderInfo.gender, "родовий"));
-    replaceAll("{3_dat}",  declineUkrainianName(firstName, genderInfo.gender, "давальний"));
+    replaceAll("{3_gen}",  genderInfo.firstGen);  
+    replaceAll("{3_dat}",  genderInfo.firstDat);  
 
     for (let i = 0; i < placeholderToIndex.length; i++) {
       if (i === 1 || i === 2) continue;
