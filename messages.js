@@ -1,4 +1,4 @@
-// Локалізовані повідомлення для системи
+
 const messages = {
   uk: {
     sheetNotFound: '❌ Лист "{sheet}" не знайдено!',
@@ -32,15 +32,7 @@ const messages = {
   }
 };
 
-/**
- * Повертає локалізоване повідомлення за ключем і мовою.
- * @param {'uk'|'en'} lang Мова ('uk' або 'en')
- * @param {string} key Ключ повідомлення
- * @param {Object} [params] Параметри для підстановки у шаблон
- * @returns {string}
- * @example
- * getMessage('uk', 'sheetNotFound', {sheet: 'Відповіді форми (1)'});
- */
+
 function getMessage(lang, key, params) {
   let msg = (messages[lang] && messages[lang][key]) || '';
   if (params) {

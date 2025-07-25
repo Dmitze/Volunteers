@@ -74,7 +74,6 @@ function generateDocumentsBatch(format) {
     replaceAll("{greeting}", greeting);
     replaceAll("{2}",      lastName);  
     replaceAll("{3}",      firstName); 
-    // Відмінювання (родовий/давальний)
     replaceAll("{2_gen}",  declineUkrainianName(lastName, genderInfo.gender, "родовий"));
     replaceAll("{2_dat}",  declinePhrase(String(row[5] || ""), genderInfo.gender, "давальний")); // теперь F:F и склонение фразы
     replaceAll("{3_gen}",  declineUkrainianName(firstName, genderInfo.gender, "родовий"));

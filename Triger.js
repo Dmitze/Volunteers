@@ -31,9 +31,12 @@ function onNewFormSubmit(e) {
   const body     = doc.getBody();
   const header   = doc.getHeader ? doc.getHeader() : null;
   const footer   = doc.getFooter ? doc.getFooter() : null;
-  const rawLast    = row[3] || "";
-  const rawFirst   = row[4] || "";
-  const combined   = `${rawLast} ${rawFirst}`.trim();
+  const rawLast = row[4] || ""; // фамилия из E:E
+  const fio = (row[5] || "").trim(); // имя и отчество из F:F
+  const fioParts = fio.split(/\s+/);
+  const rawFirst = fioParts[0] || ""; // имя
+  const rawPatron = fioParts[1] || ""; // отчество (если есть)
+  const combined = `${rawLast} ${rawFirst} ${rawPatron}`.trim();
   const genderInfo = getGenderAndFormalName(combined);
   const greeting   = genderInfo.gender === 'female' ? "Шановна пані" : "Шановний пан";
 
